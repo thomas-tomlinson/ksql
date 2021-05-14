@@ -131,6 +131,8 @@ public class KsqlConfig extends AbstractConfig {
       + "'CREATE STREAM S AS ...' will create a topic 'thing-S', where as the statement "
       + "'CREATE STREAM S WITH(KAFKA_TOPIC = 'foo') AS ...' will create a topic 'foo'.";
 
+  public static final String KSQL_FOREIGN_KEY_JOINS_ENABLED = "ksql.joins.foreign.key.enable";
+
   public static final String KSQL_ACTIVE_PERSISTENT_QUERY_LIMIT_CONFIG =
       "ksql.query.persistent.active.limit";
   private static final int KSQL_ACTIVE_PERSISTENT_QUERY_LIMIT_DEFAULT = Integer.MAX_VALUE;
@@ -269,6 +271,13 @@ public class KsqlConfig extends AbstractConfig {
           + "default code generator. They should produce the same results, but the interpreter is"
           + " much faster for short-lived queries.";
   public static final boolean KSQL_QUERY_PULL_INTERPRETER_ENABLED_DEFAULT = true;
+
+  public static final String KSQL_QUERY_PUSH_SCALABLE_ENABLED
+      = "ksql.query.push.scalable.enabled";
+  public static final String KSQL_QUERY_PUSH_SCALABLE_ENABLED_DOC =
+      "Enables whether scalable push queries are enabled. Scalable push queries require no window "
+          + "functions, aggregations, or joins, but may include projections and filters.";
+  public static final boolean KSQL_QUERY_PUSH_SCALABLE_ENABLED_DEFAULT = false;
 
   public static final String KSQL_STRING_CASE_CONFIG_TOGGLE = "ksql.cast.strings.preserve.nulls";
   public static final String KSQL_STRING_CASE_CONFIG_TOGGLE_DOC =
@@ -783,6 +792,12 @@ public class KsqlConfig extends AbstractConfig {
             Importance.MEDIUM,
             KSQL_ACTIVE_PERSISTENT_QUERY_LIMIT_DOC
         ).define(
+            KSQL_FOREIGN_KEY_JOINS_ENABLED,
+            Type.BOOLEAN,
+            false,
+            Importance.MEDIUM,
+            "Feature flag for foreign key joins, currently under development."
+        ).define(
             KSQL_SHUTDOWN_TIMEOUT_MS_CONFIG,
             Type.LONG,
             KSQL_SHUTDOWN_TIMEOUT_MS_DEFAULT,
@@ -863,6 +878,13 @@ public class KsqlConfig extends AbstractConfig {
             KSQL_QUERY_PULL_INTERPRETER_ENABLED_DEFAULT,
             Importance.LOW,
             KSQL_QUERY_PULL_INTERPRETER_ENABLED_DOC
+        )
+        .define(
+            KSQL_QUERY_PUSH_SCALABLE_ENABLED,
+            Type.BOOLEAN,
+            KSQL_QUERY_PUSH_SCALABLE_ENABLED_DEFAULT,
+            Importance.LOW,
+            KSQL_QUERY_PUSH_SCALABLE_ENABLED_DOC
         )
         .define(
             KSQL_ERROR_CLASSIFIER_REGEX_PREFIX,

@@ -15,6 +15,7 @@
 
 package io.confluent.ksql.logging.query;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.confluent.ksql.engine.rewrite.QueryAnonymizer;
 import io.confluent.ksql.util.KsqlConfig;
 import io.confluent.ksql.util.QueryGuid;
@@ -24,6 +25,17 @@ import org.apache.log4j.spi.LoggingEvent;
 
 public final class QueryAnonymizingRewritePolicy implements RewritePolicy {
   private static final QueryAnonymizer anonymizer = new QueryAnonymizer();
+
+  @VisibleForTesting
+  public String getNamespace() {
+    return namespace;
+  }
+
+  @VisibleForTesting
+  public Boolean getAnonymizeQueries() {
+    return anonymizeQueries;
+  }
+
   private final String namespace;
   private final Boolean anonymizeQueries;
 
@@ -31,7 +43,7 @@ public final class QueryAnonymizingRewritePolicy implements RewritePolicy {
     final String clusterNamespace =
         config.getString(KsqlConfig.KSQL_QUERYANONYMIZER_CLUSTER_NAMESPACE);
     this.namespace =
-        clusterNamespace.isEmpty()
+        clusterNamespace == null || clusterNamespace.isEmpty()
             ? config.getString(KsqlConfig.KSQL_SERVICE_ID_CONFIG)
             : clusterNamespace;
     this.anonymizeQueries = config.getBoolean(KsqlConfig.KSQL_QUERYANONYMIZER_ENABLED);
